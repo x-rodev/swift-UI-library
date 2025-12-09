@@ -1317,23 +1317,7 @@ local function Hide(Interface, JustHide: boolean?, Notify: boolean?, Bind: strin
 		Interface.Visible = false
 	end
 
-	if Notify then
-		if Starlight.Instance.MobileToggle.Visible then
-			Starlight:Notification({
-				Title = "Interface Hidden",
-				Icon = 87575513726659,
-				Content = "The Interface Has Been Hidden. You May Reopen It By Pressing The Small Icon Button. ",
-				Duration = 2,
-			})
-		else
-			Starlight:Notification({
-				Title = "Interface Hidden",
-				Icon = 87575513726659,
-				Content = "The Interface Has Been Hidden. You May Reopen It By Pressing The " .. Bind .. " Key.  ",
-				Duration = 2,
-			})
-		end
-	end
+	-- Notifications removed for cleaner UI experience
 
 	Starlight.Minimized = true
 end
@@ -3422,30 +3406,29 @@ end	WindowSettings.FileSettings = WindowSettings.FileSettings or {}
 			TabSection = nil
 		end
 
-		function TabSection:CreateCustomTab(TabSettings, TabIndex)
-			-- Tab Settings Table
-			--[[
-			
-			TabSettings = {
-				Name = string,
-				Columns = number, (ranged from 1-3)
-				Icon = number/string, **
-			}
-			
-			]]
+	function TabSection:CreateCustomTab(TabSettings, TabIndex)
+		-- Tab Settings Table
+		--[[
+		
+		TabSettings = {
+			Name = string,
+			Columns = number, (ranged from 1-3)
+			Icon = number/string, **
+		}
+		
+		]]
 
-			TabSettings.Icon = TabSettings.Icon or ""
-			local Tab = {
-				Instances = {},
-				Values = TabSettings,
-				Groupboxes = {},
-				Index = TabIndex,
+		TabSettings.Icon = TabSettings.Icon or ""
+		TabSettings.Columns = TabSettings.Columns or 2
+		local Tab = {
+			Instances = {},
+			Values = TabSettings,
+			Groupboxes = {},
+			Index = TabIndex,
 
-				Active = false,
-				Hover = false,
-			}
-
-			Tab.Instances.Button = navigation.NavigationSectionTemplate.TabButtonTemplate:Clone()
+			Active = false,
+			Hover = false,
+		}			Tab.Instances.Button = navigation.NavigationSectionTemplate.TabButtonTemplate:Clone()
 			Tab.Instances.Button.Visible = true
 
 			Tab.Instances.Button.Header.Text = TabSettings.Name
@@ -3585,30 +3568,29 @@ end	WindowSettings.FileSettings = WindowSettings.FileSettings or {}
 			return Starlight.Window.TabSections[Name].Tabs[TabIndex]
 		end
 
-		function TabSection:CreateTab(TabSettings, TabIndex)
-			-- Tab Settings Table
-			--[[
-			
-			TabSettings = {
-				Name = string,
-				Columns = number, (ranged from 1-3)
-				Icon = number/string, **
-			}
-			
-			]]
+	function TabSection:CreateTab(TabSettings, TabIndex)
+		-- Tab Settings Table
+		--[[
+		
+		TabSettings = {
+			Name = string,
+			Columns = number, (ranged from 1-3)
+			Icon = number/string, **
+		}
+		
+		]]
 
-			TabSettings.Icon = TabSettings.Icon or ""
-			local Tab = {
-				Instances = {},
-				Values = TabSettings,
-				Groupboxes = {},
-				Index = TabIndex,
+		TabSettings.Icon = TabSettings.Icon or ""
+		TabSettings.Columns = TabSettings.Columns or 2
+		local Tab = {
+			Instances = {},
+			Values = TabSettings,
+			Groupboxes = {},
+			Index = TabIndex,
 
-				Active = false,
-				Hover = false,
-			}
-
-			Tab.Instances.Button = navigation.NavigationSectionTemplate.TabButtonTemplate:Clone()
+			Active = false,
+			Hover = false,
+		}			Tab.Instances.Button = navigation.NavigationSectionTemplate.TabButtonTemplate:Clone()
 			Tab.Instances.Button.Visible = true
 
 			Tab.Instances.Button.Header.Text = TabSettings.Name
@@ -10683,13 +10665,5 @@ if isStudio and enabled then
 end --]=]0
 
 --// ENDSECTION
-
---// SECTION : Protection of our work
-Starlight:Notification({
-	Title = "Enjoying Starlight?",
-	Content = "Thanks for using a script that uses our UI Library. Starlight is made with love, care and effort by Nebula Softworks And Nebula Softworks alone. No other developer or such entity. We are spreading this message as a skid who claims others work as their own, a fake bitdancer (bitdancer._) on discord, is claiming Starlight as theirs. Help us protect our work by staying away from his lies. You can always find us at dsc.gg/nebulasoftworks.\nThank you ❤️",
-	Duration = 10,
-	Icon = 105789146907268,
-})
 
 return Starlight
