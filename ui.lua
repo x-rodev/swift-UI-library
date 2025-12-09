@@ -2302,25 +2302,13 @@ function Starlight:CreateWindow(WindowSettings)
 		warn("Starlight | Build Mismatch")
 		warn(
 			"Starlight may run into issues as it seems you are running an incompatible interface version ("
-				.. (StarlightUI.Resources:FindFirstChild("Build") and StarlightUI.Resources:FindFirstChild("Build").Value or "No Build")
-				.. "). of Starlight\n\nThis version of Starlight is intended for interface build "
-				.. Starlight.InterfaceBuild
-				.. ".\nTry rerunning the script. If the issue persists, join our discord for support."
-		)
-		pcall(function()
-			Starlight:Notification({
-				Title = "Starlight - Build Mistmatch",
-				Content = "Starlight may run into issues as it seems you are running an incompatible interface version ("
-					.. (StarlightUI.Resources:FindFirstChild("Build") and StarlightUI.Resources:FindFirstChild("Build").Value or "No Build")
-					.. "). of Starlight\n\nThis version of Starlight is intended for interface build "
-					.. Starlight.InterfaceBuild
-					.. ". \nTry rerunning the script. If the issue persists, join our discord for support.",
-				Icon = 129398364168201,
-			})
-		end)
-	end
-
-	WindowSettings.FileSettings = WindowSettings.FileSettings or {}
+			.. (StarlightUI.Resources:FindFirstChild("Build") and StarlightUI.Resources:FindFirstChild("Build").Value or "No Build")
+			.. "). of Starlight\n\nThis version of Starlight is intended for interface build "
+			.. Starlight.InterfaceBuild
+			.. ".\nTry rerunning the script. If the issue persists, join our discord for support."
+	)
+	-- Notification removed for cleaner startup
+end	WindowSettings.FileSettings = WindowSettings.FileSettings or {}
 	local hasOld = WindowSettings.ConfigurationSettings ~= nil
 	if WindowSettings.FileSettings.RootFolder == nil and hasOld then
 		WindowSettings.FileSettings.RootFolder = WindowSettings.ConfigurationSettings.RootFolder
