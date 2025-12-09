@@ -35,8 +35,8 @@ local Config = {
     UI = {
         CornerRadius = 8,
         Padding = 10,
-        MinimumSize = UDim2.new(0, 500, 0, 400),
-        MobileSize = UDim2.new(0, 350, 0, 450),
+        MinimumSize = UDim2.new(0, 600, 0, 450),
+        MobileSize = UDim2.new(0, 380, 0, 480),
     }
 }
 
@@ -1064,6 +1064,276 @@ function Library:New(config)
             sectionLabel.Parent = section
             
             return section
+        end
+        
+        function tab:CreateColorPicker(colorConfig)
+            colorConfig = colorConfig or {}
+            colorConfig.Name = colorConfig.Name or "Color Picker"
+            colorConfig.Default = colorConfig.Default or Color3.fromRGB(255, 255, 255)
+            colorConfig.Callback = colorConfig.Callback or function() end
+            
+            local selectedColor = colorConfig.Default
+            local pickerOpen = false
+            
+            local colorFrame = Instance.new("Frame")
+            colorFrame.Name = "ColorPicker"
+            colorFrame.BackgroundColor3 = Config.Theme.Secondary
+            colorFrame.Size = UDim2.new(1, 0, 0, 40)
+            colorFrame.ClipsDescendants = true
+            colorFrame.Parent = tabContent
+            
+            Utils:CreateCorner(8).Parent = colorFrame
+            Utils:CreatePadding(12).Parent = colorFrame
+            
+            local colorLabel = Instance.new("TextLabel")
+            colorLabel.Name = "Label"
+            colorLabel.BackgroundTransparency = 1
+            colorLabel.Size = UDim2.new(1, -50, 1, 0)
+            colorLabel.Font = Enum.Font.GothamMedium
+            colorLabel.Text = colorConfig.Name
+            colorLabel.TextColor3 = Config.Theme.Text
+            colorLabel.TextSize = 14
+            colorLabel.TextXAlignment = Enum.TextXAlignment.Left
+            colorLabel.Parent = colorFrame
+            
+            local colorDisplay = Instance.new("TextButton")
+            colorDisplay.Name = "Display"
+            colorDisplay.BackgroundColor3 = selectedColor
+            colorDisplay.Position = UDim2.new(1, -35, 0.5, 0)
+            colorDisplay.Size = UDim2.new(0, 28, 0, 28)
+            colorDisplay.AnchorPoint = Vector2.new(0, 0.5)
+            colorDisplay.Text = ""
+            colorDisplay.AutoButtonColor = false
+            colorDisplay.Parent = colorFrame
+            
+            Utils:CreateCorner(6).Parent = colorDisplay
+            Utils:CreateStroke(Config.Theme.Border, 2).Parent = colorDisplay
+            
+            -- Color Picker Panel
+            local pickerPanel = Instance.new("Frame")
+            pickerPanel.Name = "PickerPanel"
+            pickerPanel.BackgroundColor3 = Config.Theme.Border
+            pickerPanel.Position = UDim2.new(0, 5, 0, 45)
+            pickerPanel.Size = UDim2.new(1, -10, 0, 180)
+            pickerPanel.Parent = colorFrame
+            
+            Utils:CreateCorner(8).Parent = pickerPanel
+            Utils:CreatePadding(10).Parent = pickerPanel
+            
+            -- Saturation/Value Picker
+            local svPicker = Instance.new("ImageButton")
+            svPicker.Name = "SVPicker"
+            svPicker.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            svPicker.Size = UDim2.new(1, -50, 1, -20)
+            svPicker.AutoButtonColor = false
+            svPicker.Parent = pickerPanel
+            
+            Utils:CreateCorner(6).Parent = svPicker
+            
+            local svGradient = Instance.new("UIGradient")
+            svGradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+            })
+            svGradient.Rotation = 90
+            svGradient.Parent = svPicker
+            
+            local svOverlay = Instance.new("Frame")
+            svOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            svOverlay.BackgroundTransparency = 0
+            svOverlay.Size = UDim2.new(1, 0, 1, 0)
+            svOverlay.Parent = svPicker
+            
+            Utils:CreateCorner(6).Parent = svOverlay
+            
+            local svOverlayGradient = Instance.new("UIGradient")
+            svOverlayGradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+            })
+            svOverlayGradient.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0),
+                NumberSequenceKeypoint.new(1, 1)
+            })
+            svOverlayGradient.Rotation = 0
+            svOverlayGradient.Parent = svOverlay
+            
+            -- Cursor
+            local cursor = Instance.new("Frame")
+            cursor.Name = "Cursor"
+            cursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            cursor.BorderSizePixel = 0
+            cursor.Size = UDim2.new(0, 8, 0, 8)
+            cursor.AnchorPoint = Vector2.new(0.5, 0.5)
+            cursor.Position = UDim2.new(0, 0, 1, 0)
+            cursor.ZIndex = 5
+            cursor.Parent = svPicker
+            
+            Utils:CreateCorner(999).Parent = cursor
+            Utils:CreateStroke(Color3.fromRGB(0, 0, 0), 2).Parent = cursor
+            
+            -- Hue Slider
+            local hueSlider = Instance.new("ImageButton")
+            hueSlider.Name = "HueSlider"
+            hueSlider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            hueSlider.Position = UDim2.new(1, -35, 0, 0)
+            hueSlider.Size = UDim2.new(0, 35, 1, -20)
+            hueSlider.AutoButtonColor = false
+            hueSlider.Parent = pickerPanel
+            
+            Utils:CreateCorner(6).Parent = hueSlider
+            
+            local hueGradient = Instance.new("UIGradient")
+            hueGradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+                ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+                ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+                ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+                ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+            })
+            hueGradient.Rotation = 90
+            hueGradient.Parent = hueSlider
+            
+            local hueIndicator = Instance.new("Frame")
+            hueIndicator.Name = "Indicator"
+            hueIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            hueIndicator.BorderSizePixel = 0
+            hueIndicator.Size = UDim2.new(1, 0, 0, 3)
+            hueIndicator.AnchorPoint = Vector2.new(0, 0.5)
+            hueIndicator.Position = UDim2.new(0, 0, 0, 0)
+            hueIndicator.Parent = hueSlider
+            
+            Utils:CreateStroke(Color3.fromRGB(0, 0, 0), 1).Parent = hueIndicator
+            
+            -- RGB Display
+            local rgbDisplay = Instance.new("TextLabel")
+            rgbDisplay.Name = "RGBDisplay"
+            rgbDisplay.BackgroundColor3 = Config.Theme.Background
+            rgbDisplay.Position = UDim2.new(0, 0, 1, -15)
+            rgbDisplay.Size = UDim2.new(1, 0, 0, 15)
+            rgbDisplay.Font = Enum.Font.GothamMedium
+            rgbDisplay.Text = string.format("RGB: %d, %d, %d", selectedColor.R * 255, selectedColor.G * 255, selectedColor.B * 255)
+            rgbDisplay.TextColor3 = Config.Theme.TextDark
+            rgbDisplay.TextSize = 11
+            rgbDisplay.Parent = pickerPanel
+            
+            Utils:CreateCorner(4).Parent = rgbDisplay
+            
+            -- Color logic
+            local hue, sat, val = 0, 1, 1
+            
+            local function updateColor()
+                local function HSVToRGB(h, s, v)
+                    local r, g, b
+                    local i = math.floor(h * 6)
+                    local f = h * 6 - i
+                    local p = v * (1 - s)
+                    local q = v * (1 - f * s)
+                    local t = v * (1 - (1 - f) * s)
+                    i = i % 6
+                    
+                    if i == 0 then r, g, b = v, t, p
+                    elseif i == 1 then r, g, b = q, v, p
+                    elseif i == 2 then r, g, b = p, v, t
+                    elseif i == 3 then r, g, b = p, q, v
+                    elseif i == 4 then r, g, b = t, p, v
+                    elseif i == 5 then r, g, b = v, p, q
+                    end
+                    
+                    return Color3.fromRGB(r * 255, g * 255, b * 255)
+                end
+                
+                local hueColor = HSVToRGB(hue, 1, 1)
+                svPicker.BackgroundColor3 = hueColor
+                
+                selectedColor = HSVToRGB(hue, sat, val)
+                colorDisplay.BackgroundColor3 = selectedColor
+                rgbDisplay.Text = string.format("RGB: %d, %d, %d", 
+                    math.floor(selectedColor.R * 255), 
+                    math.floor(selectedColor.G * 255), 
+                    math.floor(selectedColor.B * 255))
+                
+                pcall(colorConfig.Callback, selectedColor)
+            end
+            
+            local draggingSV = false
+            local draggingHue = false
+            
+            svPicker.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    draggingSV = true
+                    local relativeX = math.clamp((input.Position.X - svPicker.AbsolutePosition.X) / svPicker.AbsoluteSize.X, 0, 1)
+                    local relativeY = math.clamp((input.Position.Y - svPicker.AbsolutePosition.Y) / svPicker.AbsoluteSize.Y, 0, 1)
+                    sat = relativeX
+                    val = 1 - relativeY
+                    cursor.Position = UDim2.new(relativeX, 0, relativeY, 0)
+                    updateColor()
+                end
+            end)
+            
+            svPicker.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    draggingSV = false
+                end
+            end)
+            
+            UserInputService.InputChanged:Connect(function(input)
+                if draggingSV and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                    local relativeX = math.clamp((input.Position.X - svPicker.AbsolutePosition.X) / svPicker.AbsoluteSize.X, 0, 1)
+                    local relativeY = math.clamp((input.Position.Y - svPicker.AbsolutePosition.Y) / svPicker.AbsoluteSize.Y, 0, 1)
+                    sat = relativeX
+                    val = 1 - relativeY
+                    cursor.Position = UDim2.new(relativeX, 0, relativeY, 0)
+                    updateColor()
+                end
+            end)
+            
+            hueSlider.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    draggingHue = true
+                    local relativeY = math.clamp((input.Position.Y - hueSlider.AbsolutePosition.Y) / hueSlider.AbsoluteSize.Y, 0, 1)
+                    hue = relativeY
+                    hueIndicator.Position = UDim2.new(0, 0, relativeY, 0)
+                    updateColor()
+                end
+            end)
+            
+            hueSlider.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    draggingHue = false
+                end
+            end)
+            
+            UserInputService.InputChanged:Connect(function(input)
+                if draggingHue and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                    local relativeY = math.clamp((input.Position.Y - hueSlider.AbsolutePosition.Y) / hueSlider.AbsoluteSize.Y, 0, 1)
+                    hue = relativeY
+                    hueIndicator.Position = UDim2.new(0, 0, relativeY, 0)
+                    updateColor()
+                end
+            end)
+            
+            colorDisplay.MouseButton1Click:Connect(function()
+                pickerOpen = not pickerOpen
+                local targetSize = pickerOpen and UDim2.new(1, 0, 0, 230) or UDim2.new(1, 0, 0, 40)
+                Utils:Tween(colorFrame, {Size = targetSize})
+            end)
+            
+            updateColor()
+            
+            return {
+                Frame = colorFrame,
+                SetValue = function(color)
+                    selectedColor = color
+                    colorDisplay.BackgroundColor3 = color
+                    updateColor()
+                end,
+                GetValue = function()
+                    return selectedColor
+                end
+            }
         end
         
         return tab
