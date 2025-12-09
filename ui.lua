@@ -10001,34 +10001,44 @@ function Starlight:CreateWindow(WindowSettings)
 			end
 		end)
 
-		StarlightUI.MobileToggle.MouseButton1Click:Connect(function()
-			if Starlight.Minimized == true then
-				if not debounce then
-					debounce = true
-					Unhide(mainWindow)
-					Unhide(StarlightUI.Drag)
-					Tween(
-						mainWindow.Content.Topbar.Controls.Minimize.Fill.Icon,
-						{ Position = UDim2.fromScale(0.5, 1.5) }
-					)
-					Tween(mainWindow.Content.Topbar.Controls.Minimize.Fill, { BackgroundTransparency = 1 })
-					task.delay(0.4, function()
-						debounce = false
-					end)
-				end
-			elseif Starlight.Minimized == false then
-				if not debounce then
-					debounce = true
-					Hide(mainWindow, false, true, Starlight.WindowKeybind)
-					Hide(StarlightUI.Drag, false, false, Starlight.WindowKeybind)
-					task.delay(0.4, function()
-						debounce = false
-					end)
-				end
+	-- Mobile toggle button with touch support
+	local function toggleWindow()
+		if Starlight.Minimized == true then
+			if not debounce then
+				debounce = true
+				Unhide(mainWindow)
+				Unhide(StarlightUI.Drag)
+				Tween(
+					mainWindow.Content.Topbar.Controls.Minimize.Fill.Icon,
+					{ Position = UDim2.fromScale(0.5, 1.5) }
+				)
+				Tween(mainWindow.Content.Topbar.Controls.Minimize.Fill, { BackgroundTransparency = 1 })
+				task.delay(0.1, function()
+					debounce = false
+				end)
 			end
-		end)
+		elseif Starlight.Minimized == false then
+			if not debounce then
+				debounce = true
+				Hide(mainWindow, false, true, Starlight.WindowKeybind)
+				Hide(StarlightUI.Drag, false, false, Starlight.WindowKeybind)
+				task.delay(0.1, function()
+					debounce = false
+				end)
+			end
+		end
+	end
 
-		connections["__windowKeybindHidingBindConnection"] = UserInputService.InputBegan:Connect(function(input, gpe)
+	StarlightUI.MobileToggle.MouseButton1Click:Connect(toggleWindow)
+	
+	-- Add touch support for mobile
+	StarlightUI.MobileToggle.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.Touch then
+			toggleWindow()
+		end
+	end)
+
+	connections["__windowKeybindHidingBindConnection"] = UserInputService.InputBegan:Connect(function(input, gpe)
 			if gpe then
 				return
 			end
